@@ -56,6 +56,14 @@ class ChatConversation extends Component {
     })
       .then((res) => console.log(res))
       .catch((err) => console.error(err));
+
+    this.Allmessages[this.props.selectedUser].push({
+      pictureUrl: "http://placehold.it/60/00A5A5/fff&text=ME",
+      displayName: "ME",
+      text: msg,
+    })
+
+    this.setState({messages: this.Allmessages[this.props.selectedUser]})
   }
 
   renderMessage(messages) {
@@ -65,7 +73,6 @@ class ChatConversation extends Component {
         pictureUrl={message.pictureUrl}
         displayName={message.displayName}
         text={message.text}
-        timestamp={message.timestamp}
       />
     ))
   }
@@ -82,11 +89,6 @@ class ChatConversation extends Component {
               <div className="panel-body">
                 <ul className="chat">
                   {this.renderMessage(this.state.messages)}
-                  <MsgBubble
-                    pictureUrl="http://placehold.it/60/00A5A5/fff&text=ME"
-                    displayName="ME"
-                    text="test"
-                  />
                 </ul>
               </div>
               <MsgInput handleSendMessage={this.handleSendMessage} />
@@ -102,7 +104,7 @@ class ChatConversation extends Component {
   }
 }
 
-const MsgBubble = ({ pictureUrl, displayName, text, timestamp }) => (
+const MsgBubble = ({ pictureUrl, displayName, text }) => (
   <li>
     <img src={pictureUrl} alt="User Avatar" style={{ float: 'left', margin: '5px 20px 5px 0' }} height="80" width="80" />
     <div className="chat-body clearfix">
