@@ -21,7 +21,10 @@ class InboxList extends Component {
 const InboxContent = ({displayName, text}) => (
   <li className="list-group-item">
     <div style={{float: "left"}}>
-      <img src="http://placehold.it/60/FA6F57/fff&text=MP" style={{display: "block", marginRight: "20px"}} />
+      <img
+        src="http://placehold.it/60/FA6F57/fff&text=MP"
+        style={{display: "block", marginRight: "20px"}}
+        alt="pic"/>
     </div>
     <div>
       <strong>{displayName}</strong>

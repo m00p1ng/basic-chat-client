@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-const key = require('../key.json')
 
 class ChatConversation extends Component {
   constructor(props) {
@@ -9,23 +8,18 @@ class ChatConversation extends Component {
   }
 
   handleSendMessage(msg) {
-    const userId = "Ufe5d05be7c7a5314dc03f43303da8198";
-    const url = "https://api.line.me/v2/bot/message/push";
-    const data = {
-      "to": userId,
-      "messages": [
+    const url = "https://b-line.herokuapp.com/webhook";
+    const messages = [
         {
-          "type": "text",
-          "text": "Hello world",
+          type: "text",
+          text: msg,
         }
-      ]
+    ]
+    const data = {
+      messages: JSON.stringify(messages)
     }
 
     axios.post(url, data, {
-      "headers": {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${key.accessToken}`
-      }
     })
       .then((res) => {
         console.log(res);
