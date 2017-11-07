@@ -10,8 +10,11 @@ class App extends Component {
     super();
 
     this.state = {
-      newMessages: []
+      newMessages: [],
+      selectedUser: '',
     }
+
+    this.handleSelectedUser = this.handleSelectedUser.bind(this);
   }
 
   componentDidMount() {
@@ -19,9 +22,20 @@ class App extends Component {
     const socket = openSocket(URL);
 
     socket.on('newEvents', (events) => {
-      console.log(events);
-      this.setState({newMessages: events});
+      this.setState({
+        ...this.state,
+        newMessages: events,
+      });
     });
+  }
+
+  handleSelectedUser(userId) {
+    if (this.state.selectedUser !== userId) {
+      this.setState({
+        ...this.state,
+        selectedUser: userId,
+      })
+    }
   }
 
   render() {
@@ -31,8 +45,8 @@ class App extends Component {
         <div style={{ marginTop: '50px' }}>
           <div className="container">
             <div className="row">
-              <InboxList newMessages={this.state.newMessages}/>
-              <ChatConversation newMessages={this.state.newMessages}/>
+              <InboxList handleSelectedUser={this.handleSelectedUser} newMessages={this.state.newMessages} />
+              <ChatConversation selectedUser={this.state.selectedUser} newMessages={this.state.newMessages} />
             </div>
           </div>
         </div>

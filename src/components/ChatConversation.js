@@ -4,7 +4,38 @@ import axios from 'axios';
 class ChatConversation extends Component {
   constructor(props) {
     super(props);
+
+    this.Allmessages = {}
+    this.state = {
+      messages: [],
+    }
+
     this.handleSendMessage = this.handleSendMessage.bind(this);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.selectedUser != "") {
+      let Allmessages = this.Allmessages;
+      let selectedUser = nextProps.selectedUser;
+
+      nextProps.newMessages.map((msg) => {
+        let userId = msg.profile.userId;
+        let newMsg = {
+          'text': msg.message.text,
+          'timestamp': msg.timestamp,
+          'msgId': msg.message.id,
+          ...msg.profile,
+        }
+
+        if (userId in Allmessages) {
+          Allmessages[userId].push(newMsg);
+        } else {
+          Allmessages[userId] = [newMsg];
+        }
+      });
+      this.Allmessages = Allmessages;
+      this.setState({ messages: Allmessages[selectedUser] })
+    }
   }
 
   handleSendMessage(msg) {
@@ -18,29 +49,31 @@ class ChatConversation extends Component {
     const data = {
       action: 'newMessages',
       messages: JSON.stringify(messages),
-      sender: 'Ufe5d05be7c7a5314dc03f43303da8198',
+      sender: this.props.selectedUser,
     };
 
     axios.post(url, data, {
     })
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+      .then((res) => console.log(res))
+      .catch((err) => console.error(err));
   }
 
-  renderMessage() {
-    return [...Array(2)].map((x, i) => (<MsgBubble
-      key={i}
-      pictureUrl="http://placehold.it/60/FA6F57/fff&text=MP"
-      displayName="Mooping"
-      text="Hello world"
-    />))
+  renderMessage(messages) {
+    return messages.map((message) => (
+      <MsgBubble
+        key={message.msgId}
+        pictureUrl={message.pictureUrl}
+        displayName={message.displayName}
+        text={message.text}
+        timestamp={message.timestamp}
+      />
+    ))
   }
 
-  render() {
+  renderChatWindow() {
+    if (this.props.selectedUser === "") {
+      return "";
+    }
     return (
       <div className="col-md-8">
         <div className="card" style={{ padding: '20px' }}>
@@ -48,7 +81,7 @@ class ChatConversation extends Component {
             <div className="panel-heading">
               <div className="panel-body">
                 <ul className="chat">
-                  {this.renderMessage()}
+                  {this.renderMessage(this.state.messages)}
                   <MsgBubble
                     pictureUrl="http://placehold.it/60/00A5A5/fff&text=ME"
                     displayName="ME"
@@ -61,13 +94,17 @@ class ChatConversation extends Component {
           </div>
         </div>
       </div>
-    );
+    )
+  }
+
+  render() {
+    return this.renderChatWindow();
   }
 }
 
-const MsgBubble = ({ pictureUrl, displayName, text }) => (
+const MsgBubble = ({ pictureUrl, displayName, text, timestamp }) => (
   <li>
-    <img src={pictureUrl} alt="User Avatar" style={{ float: 'left', margin: '5px 20px 5px 0' }} />
+    <img src={pictureUrl} alt="User Avatar" style={{ float: 'left', margin: '5px 20px 5px 0' }} height="80" width="80" />
     <div className="chat-body clearfix">
       <div className="header">
         <strong>{displayName}</strong>

@@ -25,7 +25,7 @@ class InboxList extends Component {
     this.profiles = profiles;
 
     let newProf = [];
-    for(let i in profiles) {
+    for (let i in profiles) {
       newProf.push(profiles[i]);
     }
 
@@ -33,7 +33,7 @@ class InboxList extends Component {
       return a.timestamp - b.timestamp;
     });
 
-    this.setState({profiles: newProf});
+    this.setState({ profiles: newProf });
   }
 
   renderInbox(profiles) {
@@ -45,10 +45,8 @@ class InboxList extends Component {
       return (
         <InboxContent
           key={profile.userId}
-          displayName={profile.displayName}
-          pictureUrl={profile.pictureUrl}
-          statusMessage={profile.statusMessage}
-          text={profile.lasttext}
+          profile={profile}
+          handleSelectedUser={this.props.handleSelectedUser}
         />
       )
     })
@@ -70,11 +68,11 @@ class InboxList extends Component {
     )
   }
 };
-const InboxContent = ({ displayName, text, pictureUrl, statusMessage }) => (
-  <li className="list-group-item">
+const InboxContent = ({ profile, handleSelectedUser }) => (
+  <li className="list-group-item" onClick={() => { handleSelectedUser(profile.userId) }}>
     <div style={{ float: 'left' }}>
       <img
-        src={pictureUrl}
+        src={profile.pictureUrl}
         style={{ display: 'block', marginRight: '20px' }}
         alt="pic"
         height="80"
@@ -82,9 +80,9 @@ const InboxContent = ({ displayName, text, pictureUrl, statusMessage }) => (
       />
     </div>
     <div>
-      <strong>{displayName}</strong>
-      <p style={{ color: 'grey', display: 'inline', marginLeft: '5px' }}>{statusMessage}</p>
-      <p style={{ color: 'grey' }}>{text}</p>
+      <strong>{profile.displayName}</strong>
+      <p style={{ color: 'grey', display: 'inline', marginLeft: '5px' }}>{profile.statusMessage}</p>
+      <p style={{ color: 'grey' }}>{profile.lasttext}</p>
     </div>
   </li>
 );
