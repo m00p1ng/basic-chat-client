@@ -15,8 +15,13 @@ class ChatConversation extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.selectedUser != "") {
-      let Allmessages = this.Allmessages;
       let selectedUser = nextProps.selectedUser;
+      this.setState({ messages: this.Allmessages[selectedUser] })
+    }
+
+    let s = JSON.stringify(this.props.newMessages) === JSON.stringify(nextProps.newMessages)
+    if (!s) {
+      let Allmessages = this.Allmessages;
 
       nextProps.newMessages.map((msg) => {
         let userId = msg.profile.userId;
@@ -34,7 +39,6 @@ class ChatConversation extends Component {
         }
       });
       this.Allmessages = Allmessages;
-      this.setState({ messages: Allmessages[selectedUser] })
     }
   }
 
@@ -63,10 +67,10 @@ class ChatConversation extends Component {
       text: msg,
     })
 
-    this.setState({messages: this.Allmessages[this.props.selectedUser]})
+    this.setState({ messages: this.Allmessages[this.props.selectedUser] })
   }
 
-  renderMessage(messages) {
+  renderMessages(messages) {
     return messages.map((message) => (
       <MsgBubble
         key={message.msgId}
@@ -88,7 +92,7 @@ class ChatConversation extends Component {
             <div className="panel-heading">
               <div className="panel-body">
                 <ul className="chat">
-                  {this.renderMessage(this.state.messages)}
+                  {this.renderMessages(this.state.messages)}
                 </ul>
               </div>
               <MsgInput handleSendMessage={this.handleSendMessage} />

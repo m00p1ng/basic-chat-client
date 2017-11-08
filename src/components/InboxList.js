@@ -30,7 +30,7 @@ class InboxList extends Component {
     }
 
     newProf.sort((a, b) => {
-      return a.timestamp - b.timestamp;
+      return b.timestamp - a.timestamp;
     });
 
     this.setState({ profiles: newProf });
