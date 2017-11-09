@@ -13,16 +13,16 @@ const ChatConversation = ({ selectedUser, selectedUserMessages, handleSendMessag
   }
 
   return (
-    <div className="col-md-8">
+    <div className="col-md-8 no-selection">
       <div className="card" style={{ padding: '20px' }}>
         <div className="panel panel-primary">
           <div className="panel-heading">
-            <div className="panel-body">
+            <div className="panel-body" style={{overflowY: 'scroll'}}>
               <ul className="chat">
                 {renderMessages(selectedUserMessages)}
               </ul>
             </div>
-            {selectedUser ? <MsgInput handleSendMessage={handleSendMessage}/> : ""}
+            {selectedUser ? <MsgInput handleSendMessage={handleSendMessage} /> : ""}
           </div>
         </div>
       </div>
@@ -33,7 +33,13 @@ const ChatConversation = ({ selectedUser, selectedUserMessages, handleSendMessag
 
 const MsgBubble = ({ pictureUrl, displayName, text }) => (
   <li>
-    <img src={pictureUrl} alt="User Avatar" style={{ float: 'left', margin: '5px 20px 5px 0' }} height="80" width="80" />
+    <img
+      src={pictureUrl}
+      alt="User Avatar"
+      style={{ float: 'left', margin: '5px 20px 5px 0' }}
+      height="80"
+      width="80"
+    />
     <div className="chat-body clearfix">
       <div className="header">
         <strong>{displayName}</strong>
@@ -44,7 +50,7 @@ const MsgBubble = ({ pictureUrl, displayName, text }) => (
 );
 
 
-const MsgInput = ({ handleSendMessage}) => {
+const MsgInput = ({ handleSendMessage }) => {
   let msgInput;
 
   const onSubmit = (e) => {

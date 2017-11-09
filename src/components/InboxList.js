@@ -17,11 +17,9 @@ const InboxList = ({ profiles, handleSelectedUser }) => {
     })
 
     return (
-      <div className="card">
-        <ul className="list-group">
-          {inboxContent}
-        </ul>
-      </div>
+      <ul className="list-group">
+        {inboxContent}
+      </ul>
     )
   }
 
@@ -52,7 +50,6 @@ const InboxContent = ({ profile, handleSelectedUser }) => (
     </div>
     <div>
       <strong>{profile.displayName}</strong>
-      <p style={{ color: 'grey', display: 'inline', marginLeft: '5px' }}>{profile.statusMessage}</p>
       <p style={{ color: 'grey' }}>{profile.lasttext}</p>
     </div>
   </li>

@@ -4,6 +4,7 @@ import InboxList from './InboxList';
 import ChatConversation from './ChatConversation';
 import subscribeNewEvents from '../api/socket';
 import sendMessage from '../api/sendMessage';
+import LocalStorage from '../api/localStorage';
 
 
 class App extends Component {
@@ -23,16 +24,38 @@ class App extends Component {
     this.handleSendMessage = this.handleSendMessage.bind(this);
   }
 
+  componentWillMount() {
+    const allMessages = LocalStorage.getData('allMessages');
+    const profiles = LocalStorage.getData('profiles');
+    if (allMessages) {
+      this.allMessages = allMessages;
+    }
+
+    if (profiles) {
+      this.profiles = profiles;
+
+      let newProf = [];
+      for (let i in profiles) {
+        newProf.push(profiles[i]);
+      }
+
+      this.setState({
+        profiles: newProf,
+      })
+    }
+  }
+
   componentDidMount() {
     subscribeNewEvents((event) => {
       const selectedUserMessages = this.updateMessages(event);
+      const profiles = this.updateProfiles(event);
 
       this.setState({
         ...this.state,
-        profiles: this.updateProfiles(event),
+        profiles,
         selectedUserMessages,
       });
-    })
+    });
   }
 
   updateProfiles(newMessages) {
@@ -47,6 +70,7 @@ class App extends Component {
       };
     })
     this.profiles = profiles;
+    LocalStorage.setData('profiles', profiles)
 
     let newProf = [];
     for (let i in profiles) {
@@ -80,6 +104,7 @@ class App extends Component {
     });
 
     this.allMessages = allMessages;
+    LocalStorage.setData('allMessages', allMessages);
 
     if (this.state.selectedUser) {
       const selectedUserMessages = allMessages[this.state.selectedUser];
@@ -121,16 +146,18 @@ class App extends Component {
         <Header />
         <div style={{ marginTop: '50px' }}>
           <div className="container">
-            <div className="row">
-              <InboxList
-                handleSelectedUser={this.handleSelectedUser}
-                profiles={this.state.profiles}
-              />
-              <ChatConversation
-                selectedUser={this.state.selectedUser}
-                selectedUserMessages={this.state.selectedUserMessages}
-                handleSendMessage={this.handleSendMessage}
-              />
+            <div className="card" style={{ padding: '20px' }}>
+              <div className="row">
+                <InboxList
+                  handleSelectedUser={this.handleSelectedUser}
+                  profiles={this.state.profiles}
+                />
+                <ChatConversation
+                  selectedUser={this.state.selectedUser}
+                  selectedUserMessages={this.state.selectedUserMessages}
+                  handleSendMessage={this.handleSendMessage}
+                />
+              </div>
             </div>
           </div>
         </div>
