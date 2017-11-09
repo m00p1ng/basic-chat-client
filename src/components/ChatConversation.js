@@ -1,5 +1,4 @@
-import React, { Component } from 'react';
-import sendMessage from '../api/sendMessage';
+import React from 'react';
 
 const ChatConversation = ({ selectedUser, selectedUserMessages, handleSendMessage }) => {
   const renderMessages = (messages) => {

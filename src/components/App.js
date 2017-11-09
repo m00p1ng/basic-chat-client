@@ -25,10 +25,12 @@ class App extends Component {
 
   componentDidMount() {
     subscribeNewEvents((event) => {
+      const selectedUserMessages = this.updateMessages(event);
+
       this.setState({
         ...this.state,
         profiles: this.updateProfiles(event),
-        selectedUserMessages: this.updateMessages(event),
+        selectedUserMessages,
       });
     })
   }
@@ -36,7 +38,7 @@ class App extends Component {
   updateProfiles(newMessages) {
     let profiles = this.profiles;
 
-    newMessages.map((message) => {
+    newMessages.forEach((message) => {
       let userId = message.profile.userId;
       profiles[userId] = {
         'lasttext': message.message.text,
@@ -60,8 +62,8 @@ class App extends Component {
 
   updateMessages(newMessages) {
     let allMessages = this.allMessages;
-    
-    newMessages.map((msg) => {
+
+    newMessages.forEach((msg) => {
       let userId = msg.profile.userId;
       let newMsg = {
         'text': msg.message.text,
@@ -79,7 +81,11 @@ class App extends Component {
 
     this.allMessages = allMessages;
 
-    return allMessages[this.state.selectedUser];
+    if (this.state.selectedUser) {
+      const selectedUserMessages = allMessages[this.state.selectedUser];
+      return selectedUserMessages;
+    }
+    return [];
   }
 
   handleSelectedUser(userId) {
