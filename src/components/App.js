@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import openSocket from 'socket.io-client';
 import Header from './Header';
 import InboxList from './InboxList';
 import ChatConversation from './ChatConversation';
+import subscribeNewEvents from '../api/socket';
+import sendMessage from '../api/sendMessage';
 
 
 class App extends Component {
@@ -10,30 +11,100 @@ class App extends Component {
     super();
 
     this.state = {
-      newMessages: [],
+      profiles: [],
       selectedUser: '',
+      selectedUserMessages: [],
     }
 
+    this.profiles = {};
+    this.allMessages = {};
+
     this.handleSelectedUser = this.handleSelectedUser.bind(this);
+    this.handleSendMessage = this.handleSendMessage.bind(this);
   }
 
   componentDidMount() {
-    const URL = 'https://b-line.herokuapp.com';
-    const socket = openSocket(URL);
-
-    socket.on('newEvents', (events) => {
+    subscribeNewEvents((event) => {
       this.setState({
         ...this.state,
-        newMessages: events,
+        profiles: this.updateProfiles(event),
+        selectedUserMessages: this.updateMessages(event),
       });
+    })
+  }
+
+  updateProfiles(newMessages) {
+    let profiles = this.profiles;
+
+    newMessages.map((message) => {
+      let userId = message.profile.userId;
+      profiles[userId] = {
+        'lasttext': message.message.text,
+        'timestamp': message.timestamp,
+        ...message.profile
+      };
+    })
+    this.profiles = profiles;
+
+    let newProf = [];
+    for (let i in profiles) {
+      newProf.push(profiles[i]);
+    }
+
+    newProf.sort((a, b) => {
+      return b.timestamp - a.timestamp;
     });
+
+    return newProf;
+  }
+
+  updateMessages(newMessages) {
+    let allMessages = this.allMessages;
+    
+    newMessages.map((msg) => {
+      let userId = msg.profile.userId;
+      let newMsg = {
+        'text': msg.message.text,
+        'timestamp': msg.timestamp,
+        'msgId': msg.message.id,
+        ...msg.profile,
+      }
+
+      if (userId in allMessages) {
+        allMessages[userId].push(newMsg);
+      } else {
+        allMessages[userId] = [newMsg];
+      }
+    });
+
+    this.allMessages = allMessages;
+
+    return allMessages[this.state.selectedUser];
   }
 
   handleSelectedUser(userId) {
-    if (this.state.selectedUser !== userId) {
+    this.setState({
+      ...this.state,
+      selectedUser: userId,
+      selectedUserMessages: this.allMessages[userId],
+    })
+  }
+
+  handleSendMessage(msg) {
+    let selectedUser = this.state.selectedUser;
+    this.allMessages[selectedUser].push({
+      pictureUrl: "http://placehold.it/60/00A5A5/fff&text=ME",
+      displayName: "ME",
+      text: msg,
+    })
+
+    sendMessage(msg, selectedUser);
+
+    if (selectedUser) {
+      let selectedUserMessages = this.allMessages[selectedUser];
       this.setState({
         ...this.state,
-        selectedUser: userId,
+        selectedUserMessages,
       })
     }
   }
@@ -45,8 +116,15 @@ class App extends Component {
         <div style={{ marginTop: '50px' }}>
           <div className="container">
             <div className="row">
-              <InboxList handleSelectedUser={this.handleSelectedUser} newMessages={this.state.newMessages} />
-              <ChatConversation selectedUser={this.state.selectedUser} newMessages={this.state.newMessages} />
+              <InboxList
+                handleSelectedUser={this.handleSelectedUser}
+                profiles={this.state.profiles}
+              />
+              <ChatConversation
+                selectedUser={this.state.selectedUser}
+                selectedUserMessages={this.state.selectedUserMessages}
+                handleSendMessage={this.handleSendMessage}
+              />
             </div>
           </div>
         </div>

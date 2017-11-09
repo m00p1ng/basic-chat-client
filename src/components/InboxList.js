@@ -1,42 +1,7 @@
-import React, { Component } from 'react';
+import React from 'react';
 
-class InboxList extends Component {
-  constructor(props) {
-    super(props);
-
-    this.profiles = {};
-
-    this.state = {
-      profiles: []
-    }
-  }
-
-  componentWillReceiveProps(nextProps) {
-    let profiles = this.profiles;
-
-    nextProps.newMessages.map((message) => {
-      let userId = message.profile.userId;
-      profiles[userId] = {
-        'lasttext': message.message.text,
-        'timestamp': message.timestamp,
-        ...message.profile
-      };
-    })
-    this.profiles = profiles;
-
-    let newProf = [];
-    for (let i in profiles) {
-      newProf.push(profiles[i]);
-    }
-
-    newProf.sort((a, b) => {
-      return b.timestamp - a.timestamp;
-    });
-
-    this.setState({ profiles: newProf });
-  }
-
-  renderInbox(profiles) {
+const InboxList = ({ profiles, handleSelectedUser }) => {
+  let renderInbox = (profiles) => {
     if (!profiles.length) {
       return <h4>No message</h4>
     }
@@ -46,7 +11,7 @@ class InboxList extends Component {
         <InboxContent
           key={profile.userId}
           profile={profile}
-          handleSelectedUser={this.props.handleSelectedUser}
+          handleSelectedUser={handleSelectedUser}
         />
       )
     })
@@ -60,14 +25,20 @@ class InboxList extends Component {
     )
   }
 
-  render() {
-    return (
-      <div className="col-md-4">
-        {this.renderInbox(this.state.profiles)}
+  return (
+    <div className="col-md-4">
+      <div className="panel panel-primary">
+        <div className="panel-heading">
+          <div className="panel-body">
+            {renderInbox(profiles)}
+          </div>
+        </div>
       </div>
-    )
-  }
+    </div>
+  )
 };
+
+
 const InboxContent = ({ profile, handleSelectedUser }) => (
   <li className="list-group-item" onClick={() => { handleSelectedUser(profile.userId) }}>
     <div style={{ float: 'left' }}>
