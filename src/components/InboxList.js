@@ -1,4 +1,5 @@
 import React from 'react';
+import moment from 'moment';
 
 const InboxList = ({ profiles, handleSelectedUser }) => {
   let renderInbox = (profiles) => {
@@ -50,7 +51,8 @@ const InboxContent = ({ profile, handleSelectedUser }) => (
     </div>
     <div>
       <strong>{profile.displayName}</strong>
-      <p style={{ color: 'grey' }}>{profile.lasttext}</p>
+      <span style={{fontSize: '0.9em', display: 'block', color: '#AAAAAA' }}>{moment(profile.timestamp).startOf("minute").fromNow()}</span>
+      <span style={{display: 'block', color: 'grey', marginTop: '0.3em' }}>{profile.lasttext}</span>
     </div>
   </li>
 );

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const url = 'https://b-line.herokuapp.com/webhook-line';
+const url = 'https://b-line.herokuapp.com/webhook';
 
 const sendMessage = (msg, selectedUser) => {
   const messages = [
@@ -15,8 +15,7 @@ const sendMessage = (msg, selectedUser) => {
     sender: selectedUser,
   };
 
-  axios.post(url, data, {
-  })
+  axios.post(url, data)
     .then((res) => console.log(res))
     .catch((err) => console.error(err));
 }

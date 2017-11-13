@@ -1,4 +1,5 @@
 import React from 'react';
+import moment from 'moment';
 
 const ChatConversation = ({ selectedUser, selectedUserMessages, handleSendMessage }) => {
   const renderMessages = (messages) => {
@@ -8,6 +9,7 @@ const ChatConversation = ({ selectedUser, selectedUserMessages, handleSendMessag
         pictureUrl={message.pictureUrl}
         displayName={message.displayName}
         text={message.text}
+        timestamp={message.timestamp}
       />
     ))
   }
@@ -31,7 +33,7 @@ const ChatConversation = ({ selectedUser, selectedUserMessages, handleSendMessag
 }
 
 
-const MsgBubble = ({ pictureUrl, displayName, text }) => (
+const MsgBubble = ({ timestamp, pictureUrl, displayName, text }) => (
   <li>
     <img
       src={pictureUrl}
@@ -43,6 +45,7 @@ const MsgBubble = ({ pictureUrl, displayName, text }) => (
     <div className="chat-body clearfix">
       <div className="header">
         <strong>{displayName}</strong>
+        <span style={{fontSize: '0.9em', color: '#AAAAAA' }}> - {moment(timestamp).startOf("minute").fromNow()}</span>
       </div>
       <p>{text}</p>
     </div>

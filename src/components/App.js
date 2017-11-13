@@ -12,13 +12,12 @@ class App extends Component {
     super();
 
     this.state = {
+      profilesObj: {},
       profiles: [],
       selectedUser: '',
+      allMessages: {},
       selectedUserMessages: [],
     }
-
-    this.profiles = {};
-    this.allMessages = {};
 
     this.handleSelectedUser = this.handleSelectedUser.bind(this);
     this.handleSendMessage = this.handleSendMessage.bind(this);
@@ -26,21 +25,22 @@ class App extends Component {
 
   componentWillMount() {
     const allMessages = LocalStorage.getData('allMessages');
-    const profiles = LocalStorage.getData('profiles');
-    if (allMessages) {
-      this.allMessages = allMessages;
-    }
+    const profilesObj = LocalStorage.getData('profiles');
 
-    if (profiles) {
-      this.profiles = profiles;
-
+    if (profilesObj) {
       let newProf = [];
-      for (let i in profiles) {
-        newProf.push(profiles[i]);
+      for (let i in profilesObj) {
+        newProf.push(profilesObj[i]);
       }
+
+      newProf.sort((a, b) => {
+        return b.timestamp - a.timestamp;
+      })
 
       this.setState({
         profiles: newProf,
+        profilesObj,
+        allMessages,
       })
     }
   }
@@ -59,22 +59,26 @@ class App extends Component {
   }
 
   updateProfiles(newMessages) {
-    let profiles = this.profiles;
+    let profilesObj = this.state.profilesObj;
 
     newMessages.forEach((message) => {
       let userId = message.profile.userId;
-      profiles[userId] = {
+      profilesObj[userId] = {
         'lasttext': message.message.text,
         'timestamp': message.timestamp,
         ...message.profile
       };
     })
-    this.profiles = profiles;
-    LocalStorage.setData('profiles', profiles)
+
+    this.setState({
+      ...this.state,
+      profilesObj,
+    })
+    LocalStorage.setData('profiles', profilesObj)
 
     let newProf = [];
-    for (let i in profiles) {
-      newProf.push(profiles[i]);
+    for (let i in profilesObj) {
+      newProf.push(profilesObj[i]);
     }
 
     newProf.sort((a, b) => {
@@ -85,7 +89,7 @@ class App extends Component {
   }
 
   updateMessages(newMessages) {
-    let allMessages = this.allMessages;
+    let allMessages = this.state.allMessages;
 
     newMessages.forEach((msg) => {
       let userId = msg.profile.userId;
@@ -103,7 +107,10 @@ class App extends Component {
       }
     });
 
-    this.allMessages = allMessages;
+    this.setState({
+      ...this.state,
+      allMessages,
+    })
     LocalStorage.setData('allMessages', allMessages);
 
     if (this.state.selectedUser) {
@@ -117,27 +124,35 @@ class App extends Component {
     this.setState({
       ...this.state,
       selectedUser: userId,
-      selectedUserMessages: this.allMessages[userId],
+      selectedUserMessages: this.state.allMessages[userId],
     })
   }
 
   handleSendMessage(msg) {
     let selectedUser = this.state.selectedUser;
-    this.allMessages[selectedUser].push({
+    let timestampNow = Date.now();
+    let allMessages = this.state.allMessages;
+
+    allMessages[selectedUser].push({
       pictureUrl: "http://placehold.it/60/00A5A5/fff&text=ME",
       displayName: "ME",
       text: msg,
+      timestamp: timestampNow,
+      msgId: 'me-' + timestampNow,
     })
 
     sendMessage(msg, selectedUser);
 
     if (selectedUser) {
-      let selectedUserMessages = this.allMessages[selectedUser];
+      let selectedUserMessages = allMessages[selectedUser];
       this.setState({
         ...this.state,
         selectedUserMessages,
+        allMessages,
       })
     }
+
+    LocalStorage.setData('allMessages', allMessages);
   }
 
   render() {
